@@ -16,6 +16,8 @@ from . import (chinese_convert_mapper,
                video_split_by_duration_mapper,
                video_split_by_key_frame_mapper,
                video_tagging_from_frames_mapper,
+               video_captioning_from_audio_mapper,
+               video_resize_aspect_ratio_mapper,
                whitespace_normalization_mapper)
 
 # yapf: enable
