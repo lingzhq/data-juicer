@@ -24,7 +24,7 @@ streamlit
 spacy
 multiprocess==0.70.12
 dill==0.3.4
-import accelerate
+accelerate
 einops
 tiktoken
 transformers_stream_generator 
