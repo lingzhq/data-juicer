@@ -1,12 +1,12 @@
 # 开发者指南
 
-* [开发者指南](#开发者指南)
-   * [编码规范](#编码规范)
-   * [构建自己的算子](#构建自己的算子)
-      * [（可选）使新算子可以进行算子融合](#可选使新算子可以进行算子融合)
-   * [构建自己的配置](#构建自己的配置)
-      * [丰富的配置源和类型提示](#丰富的配置源和类型提示)
-      * [层次化的配置和帮助](#层次化的配置和帮助)
+- [开发者指南](#开发者指南)
+  - [编码规范](#编码规范)
+  - [构建自己的算子](#构建自己的算子)
+    - [（可选）使新算子可以进行算子融合](#可选使新算子可以进行算子融合)
+  - [构建自己的配置](#构建自己的配置)
+    - [丰富的配置源和类型提示](#丰富的配置源和类型提示)
+    - [层次化的配置和帮助](#层次化的配置和帮助)
 
 ## 编码规范
 
@@ -122,27 +122,24 @@ class StatsKeys(object):
     ```
 
     - 如果算子批量处理数据，输入不是一个样本而是一个batch，需要声明`self._batched_op = True`。
-     ```python
-    # ... (same as above)
-
-    @OPERATORS.register_module('text_length_filter')
-    class TextLengthFilter(Filter):
+    ```python
+    # ... (import some other libraries)
+    OP_NAME = 'image_diffusion_mapper'
+    @OPERATORS.register_module(OP_NAME)
+    @LOADED_IMAGES.register_module(OP_NAME)
+    class ImageDiffusionMapper(Mapper):
         def __init__(self,
-                    min_len: PositiveInt = 10,
-                    max_len: PositiveInt = sys.maxsize,
-                    *args,
-                    **kwargs):
-            # ... (same as above)
+                 # ... (OP parameters)
+                 *args,
+                 **kwargs):
+            super().__init__(*args, **kwargs)
             self._batched_op = True
 
-        def compute_stats(self, sample, rank=None):
-            # ... (same as above)
-
-        def process(self, sample, rank=None):
-            # ... (same as above)
+        def process(self, samples):
+            # ... (some codes)
     ```
 
-    - 在mapper算子中，我们提供了产生额外数据的存储路径生成接口，避免出现进程冲突和数据覆盖的情况。生成的存储路径格式为`{ORIGINAL_DATAPATH}/{OP_NAME}/{ORIGINAL_FILENAME}__dj_hash_#{HASH_VALUE}#.{EXT}`，其中`HASH_VALUE`是算子初始化参数、每个样本中相关参数、进程ID和时间戳的哈希值。为了方便，可以在OP类初始化开头调用`self.remove_extra_parameters(locals())`获取算子初始化参数，同时可以调用`self.add_parameters`添加每个样本与生成额外数据相关的参数。例如，利用diffusion模型对图像进行增强的算子：
+    - 在mapper算子中，我们提供了产生额外数据的存储路径生成接口，避免出现进程冲突和数据覆盖的情况。生成的存储路径格式为`{ORIGINAL_DATAPATH}/__dj__produced_data__/{OP_NAME}/{ORIGINAL_FILENAME}__dj_hash_#{HASH_VALUE}#.{EXT}`，其中`HASH_VALUE`是算子初始化参数、每个样本中相关参数、进程ID和时间戳的哈希值。为了方便，可以在OP类初始化开头调用`self.remove_extra_parameters(locals())`获取算子初始化参数，同时可以调用`self.add_parameters`添加每个样本与生成额外数据相关的参数。例如，利用diffusion模型对图像进行增强的算子：
     ```python
     # ... (import some library)
     OP_NAME = 'image_diffusion_mapper'
@@ -156,7 +153,7 @@ class StatsKeys(object):
             super().__init__(*args, **kwargs)
             self._init_parameters = self.remove_extra_parameters(locals())
 
-        def process(self, sample, rank=None):
+        def process(self, sample):
             # ... (some codes)
             # captions[index] is the prompt for diffusion model
             related_parameters = self.add_parameters(
@@ -179,21 +176,25 @@ class StatsKeys(object):
             super().__init__(*args, **kwargs)
             self._init_parameters = self.remove_extra_parameters(locals())
 
-        def process(self, sample, rank=None):
+        def process(self, sample):
             # ... (some codes)
             split_video_path = transfer_filename(
                         original_video_path, OP_NAME, **self._init_parameters)
-            suffix = '_split-by-key-frame-' + str(count)
-            split_video_path = add_suffix_to_filename(split_video_path, suffix)
+            split_video_path = add_suffix_to_filename(split_video_path, f'_{count}')
             # ... (some codes)
     ```
 
 3. 实现后，将其添加到 `data_juicer/ops/filter` 目录下 `__init__.py` 文件中的算子字典中：
 
 ```python
-from . import (...,              # other ops
-               text_length_filter)  # import this new op module
-
+from . import (...,              # other OPs
+               text_length_filter)  # import this new OP module
+# other OPs
+from text_length_filter import TextLengthFilter  # import this new OP class
+__all__ = [
+    # other Ops
+    text_length_filter,  # add this new Op to __all__
+]
 ```
 
 4. 全部完成！现在您可以在自己的配置文件中使用新添加的算子：
@@ -271,6 +272,7 @@ if __name__ == '__main__':
    ```
 
    3. `docs/Operators_ZH.md`：该文档为6.ii中`docs/Operators.md`文档的中文版，需要更新相同位置处的中文内容。
+
 
 ### （可选）使新算子可以进行算子融合
 

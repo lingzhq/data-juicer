@@ -19,6 +19,9 @@ class Fields(object):
     video_frame_tags = DEFAULT_PREFIX + 'video_frame_tags__'
     video_audio_tags = DEFAULT_PREFIX + 'video_audio_tags__'
 
+    # the name of diretory to store the produced multimodal data
+    multimodal_data_output_dir = DEFAULT_PREFIX + 'produced_data__'
+
 
 class StatsKeysMeta(type):
     """
@@ -130,6 +133,8 @@ class StatsKeysConstant(object):
     face_ratios = 'face_ratios'
     face_detections = 'face_detections'
     image_aesthetics_scores = 'image_aesthetics_scores'
+    image_nsfw_score = 'image_nsfw_score'
+    image_watermark_prob = 'image_watermark_prob'
 
     # audios
     audio_duration = 'audio_duration'
@@ -145,6 +150,8 @@ class StatsKeysConstant(object):
     video_aesthetic_score = 'video_aesthetic_score'
     video_frames_aesthetics_score = 'video_frames_aesthetics_score'
     video_motion_score = 'video_motion_score'
+    video_nsfw_score = 'video_nsfw_score'
+    video_watermark_prob = 'video_watermark_prob'
 
     # multimodal
     # image-text
@@ -153,7 +160,7 @@ class StatsKeysConstant(object):
     phrase_grounding_recall = 'phrase_grounding_recall'
 
     # video-text
-    video_frames_text_matching_score = 'video_frames_text_matching_score'
+    video_frames_text_similarity = 'video_frames_text_similarity'
 
 
 class StatsKeys(object, metaclass=StatsKeysMeta):
@@ -171,6 +178,9 @@ class HashKeys(object):
     # video
     videohash = DEFAULT_PREFIX + 'videohash'
 
+    # duplicate flag
+    is_duplicate = DEFAULT_PREFIX + 'is_duplicate'
+
 
 class InterVars(object):
     # text
@@ -185,4 +195,10 @@ class InterVars(object):
     loaded_audios = DEFAULT_PREFIX + 'loaded_audios'  # (data, sampling_rate)
 
     # videos
-    loaded_videos = DEFAULT_PREFIX + 'loaded_videos'  # InputContainer from av
+    # InputContainer from av.
+    # Key: {video_path}
+    loaded_videos = DEFAULT_PREFIX + 'loaded_videos'
+    # sampled frames.
+    # Key: {video_path}-{frame_sampling_method}[-{frame_num}]
+    #   {frame_num} is only used when {frame_sampling_method} is "uniform"
+    sampled_frames = DEFAULT_PREFIX + 'sampled_frames'

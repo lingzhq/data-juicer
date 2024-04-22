@@ -6,7 +6,7 @@ from typing import Dict, List, Tuple, Union
 
 from jsonargparse import (ActionConfigFile, ArgumentParser, dict_to_namespace,
                           namespace_to_dict)
-from jsonargparse.typing import NonNegativeInt, PositiveInt
+from jsonargparse.typing import ClosedUnitInterval, NonNegativeInt, PositiveInt
 from loguru import logger
 
 from data_juicer.ops.base_op import OPERATORS
@@ -32,7 +32,7 @@ def init_configs(args=None):
 
     parser.add_argument('--config',
                         action=ActionConfigFile,
-                        help='Path to a configuration file.',
+                        help='Path to a dj basic configuration file.',
                         required=True)
 
     parser.add_argument(
@@ -41,9 +41,58 @@ def init_configs(args=None):
         help='Path to a configuration file when using auto-HPO tool.',
         required=False)
     parser.add_argument(
-        '--path_3sigma_recipe',
+        '--path_k_sigma_recipe',
         type=str,
-        help='Path to save a configuration file when using 3-sigma tool.',
+        help='Path to save a configuration file when using k-sigma tool.',
+        required=False)
+    parser.add_argument(
+        '--path_model_feedback_recipe',
+        type=str,
+        help='Path to save a configuration file refined by model feedback.',
+        required=False)
+    parser.add_argument(
+        '--model_infer_config',
+        type=Union[str, dict],
+        help='Path or a dict to model inference configuration file when '
+        'calling model executor in sandbox. If not specified, the model '
+        'inference related hooks will be disabled.',
+        required=False)
+    parser.add_argument(
+        '--model_train_config',
+        type=Union[str, dict],
+        help='Path or a dict to model training configuration file when '
+        'calling model executor in sandbox. If not specified, the model '
+        'training related hooks will be disabled.',
+        required=False)
+    parser.add_argument(
+        '--data_eval_config',
+        type=Union[str, dict],
+        help='Path or a dict to eval configuration file when calling '
+        'auto-evaluator for data in sandbox. '
+        'If not specified, the eval related hooks will be disabled.',
+        required=False)
+    parser.add_argument(
+        '--model_eval_config',
+        type=Union[str, dict],
+        help='Path or a dict to eval configuration file when calling '
+        'auto-evaluator for model in sandbox. '
+        'If not specified, the eval related hooks will be disabled.',
+        required=False)
+    parser.add_argument(
+        '--data_probe_algo',
+        type=str,
+        default='uniform',
+        help='Sampling algorithm to use. Options are "uniform", '
+        '"frequency_specified_field_selector", or '
+        '"topk_specified_field_selector". Default is "uniform". Only '
+        'used for dataset sampling',
+        required=False)
+    parser.add_argument(
+        '--data_probe_ratio',
+        type=ClosedUnitInterval,
+        default=1.0,
+        help='The ratio of the sample size to the original dataset size. '
+        'Default is 1.0 (no sampling). Only used for dataset sampling',
         required=False)
 
     # basic global paras with extended type hints
@@ -268,8 +317,8 @@ def init_configs(args=None):
 
     try:
         cfg = parser.parse_args(args=args)
-        cfg = update_op_process(cfg, parser)
         cfg = init_setup_from_cfg(cfg)
+        cfg = update_op_process(cfg, parser)
 
         # copy the config file into the work directory
         config_backup(cfg)
@@ -422,11 +471,15 @@ def init_setup_from_cfg(cfg):
                     'audio_key': cfg.audio_key,
                     'video_key': cfg.video_key,
                 }
-            elif args['text_key'] is None:
-                args['text_key'] = text_key
-                args['image_key'] = cfg.image_key
-                args['audio_key'] = cfg.audio_key
-                args['video_key'] = cfg.video_key
+            else:
+                if 'text_key' not in args or args['text_key'] is None:
+                    args['text_key'] = text_key
+                if 'image_key' not in args or args['image_key'] is None:
+                    args['image_key'] = cfg.image_key
+                if 'audio_key' not in args or args['audio_key'] is None:
+                    args['audio_key'] = cfg.audio_key
+                if 'video_key' not in args or args['video_key'] is None:
+                    args['video_key'] = cfg.video_key
             op[op_name] = args
 
     return cfg
@@ -436,7 +489,7 @@ def _collect_config_info_from_class_docs(configurable_ops, parser):
     """
     Add ops and its params to parser for command line.
 
-    :param configurable_ops: a list of ops to be to added, each item is
+    :param configurable_ops: a list of ops to be added, each item is
         a pair of op_name and op_class
     :param parser: jsonargparse parser need to update
     """
@@ -532,7 +585,8 @@ def config_backup(cfg):
     target_path = os.path.join(work_dir, os.path.basename(cfg_path))
     logger.info(f'Back up the input config file [{cfg_path}] into the '
                 f'work_dir [{work_dir}]')
-    shutil.copyfile(cfg_path, target_path)
+    if not os.path.exists(target_path):
+        shutil.copyfile(cfg_path, target_path)
 
 
 def display_config(cfg):
@@ -563,7 +617,8 @@ def export_config(cfg,
                   overwrite=False,
                   multifile=True):
     """
-        save the config object, some params are from jsonargparse
+    Save the config object, some params are from jsonargparse
+
     :param cfg: cfg object to save (Namespace type)
     :param path: the save path
     :param format: 'yaml', 'json', 'json_indented', 'parser_mode'
@@ -596,14 +651,14 @@ def export_config(cfg,
 
 def merge_config(ori_cfg, new_cfg: Dict):
     """
-        Merge configuration from new_cfg into ori_cfg
+    Merge configuration from new_cfg into ori_cfg
 
     :param ori_cfg: the original configuration object, whose type is
-    expected as namespace from jsonargparse
+        expected as namespace from jsonargparse
     :param new_cfg: the configuration object to be merged, whose type is
-    expected as dict or namespace from jsonargparse
+        expected as dict or namespace from jsonargparse
 
-    :return cfg_after_merge
+    :return: cfg_after_merge
     """
     try:
         ori_specified_op_names = set()

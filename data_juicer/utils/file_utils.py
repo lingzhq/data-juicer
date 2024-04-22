@@ -1,14 +1,47 @@
+import asyncio
 import copy
 import hashlib
 import os
 import re
+import shutil
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import List, Tuple, Union
+from typing import AsyncGenerator, List, Tuple, Union
 
 from datasets.utils.extract import ZstdExtractor as Extractor
 
-from data_juicer.utils.constant import DEFAULT_PREFIX
+from data_juicer.utils.constant import DEFAULT_PREFIX, Fields
+
+
+async def follow_read(
+    logfile_path: str,
+    skip_existing_content: bool = False,
+) -> AsyncGenerator:
+    """Read a file in online and iterative manner
+
+    Args:
+        logfile_path (`str`):
+            The file path to be read.
+        skip_existing_content (`bool`, defaults to `False):
+            If True, read from the end, otherwise read from the beginning.
+
+    Returns:
+        One line string of the file content.
+    """
+    # in most unix file systems, the read operation is safe
+    # for a file being target file of another "write process"
+    with open(logfile_path, 'r', encoding='utf-8', errors='ignore') as logfile:
+        if skip_existing_content:
+            # move to the file's end, similar to `tail -f`
+            logfile.seek(0, 2)
+
+        while True:
+            line = logfile.readline()
+            if not line:
+                # no new line, wait to avoid CPU override
+                await asyncio.sleep(0.1)
+                continue
+            yield line
 
 
 def find_files_with_suffix(
@@ -129,26 +162,30 @@ def transfer_filename(original_filepath: Union[str, Path], op_name,
     """
         According to the op and hashing its parameters 'op_kwargs' addition
         to the process id and current time as the 'hash_val', map the
-        original_filepath to another unique file path.
-        E.g.
-        1. abc.jpg -->
-            {op_name}/abc__dj_hash_#{hash_val}#.jpg
-        2. ./abc.jpg -->
-            ./{op_name}/abc__dj_hash_#{hash_val}#.jpg
-        3. /path/to/abc.jpg -->
-           /path/to/{op_name}/abc__dj_hash_#{hash_val}#.jpg
-        4. /path/to/{op_name}/abc.jpg -->
-           /path/to/{op_name}/abc__dj_hash_#{hash_val}#.jpg
-        5. /path/to/{op_name}/abc__dj_hash_#{hash_val1}#.jpg -->
-           /path/to/{op_name}/abc__dj_hash_#{hash_val2}#.jpg
+        original_filepath to another unique file path. E.g.
+
+            1. abc.jpg -->
+                __dj__produced_data__/{op_name}/
+                abc__dj_hash_#{hash_val}#.jpg
+            2. ./abc.jpg -->
+                ./__dj__produced_data__/{op_name}/
+                abc__dj_hash_#{hash_val}#.jpg
+            3. /path/to/abc.jpg -->
+                /path/to/__dj__produced_data__/{op_name}/
+                abc__dj_hash_#{hash_val}#.jpg
+            4. /path/to/__dj__produced_data__/{op_name}/
+                abc__dj_hash_#{hash_val1}#.jpg -->
+                /path/to/__dj__produced_data__/{op_name}/
+                abc__dj_hash_#{hash_val2}#.jpg
+
     """
     # produce the directory
     original_dir = os.path.dirname(original_filepath)
-    parent_dir = os.path.basename(original_dir)
-    if parent_dir == op_name:
-        new_dir = original_dir
-    else:
-        new_dir = os.path.join(original_dir, f'{op_name}')
+    dir_token = f'/{Fields.multimodal_data_output_dir}/'
+    if dir_token in original_dir:
+        original_dir = original_dir.split(dir_token)[0]
+    new_dir = os.path.join(original_dir,
+                           f'{Fields.multimodal_data_output_dir}/{op_name}')
     create_directory_if_not_exists(new_dir)
 
     # produce the unique hash code
@@ -176,3 +213,19 @@ def transfer_filename(original_filepath: Union[str, Path], op_name,
     new_filepath = os.path.join(new_dir, f'{new_name}{ext}')
 
     return new_filepath
+
+
+def copy_data(from_dir, to_dir, data_path):
+    """
+        Copy data from from_dir/data_path to to_dir/data_path.
+        Return Ture if success.
+    """
+    from_path = os.path.join(from_dir, data_path)
+    to_path = os.path.join(to_dir, data_path)
+    if not os.path.exists(from_path):
+        return False
+    parent_dir = os.path.dirname(to_path)
+    if not os.path.exists(parent_dir):
+        os.makedirs(parent_dir)
+    shutil.copy2(from_path, to_path)
+    return True
