@@ -9,7 +9,7 @@ We release **DaaR**,  A data diversity-driven reward method for high-quality dat
 
 ## Codes and Data Recipes
 
-- The original codes are organized and presented in [DaaR](https://github.com/lingzhq/data-juicer/DaaR/DaaR).
+- The original codes are organized and presented in [DaaR](https://github.com/lingzhq/data-juicer/tree/DaaR/DaaR).
 - We wil develop a series of data-juicer operators related to DaaR.
 
 
