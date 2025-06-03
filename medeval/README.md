@@ -49,7 +49,7 @@ python flames/infer.py
 2. Evaluate model responses. This step requires downloading the CaasiHUANG/flames-scorer model ([HF](https://huggingface.co/CaasiHUANG/flames-scorer)). Once completed, you will obtain harmless-related results.
 
 ```bash
-python flames/evaluate.py
+python -m flames.evaluate
 ```
 
 ### InfoBench

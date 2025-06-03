@@ -22,7 +22,7 @@ async def process_one(item):
         response = await client.chat.completions.create(
             model="qwen25-7b-ckpt",
             messages=messages,
-            temperature=0.01,
+            temperature=0.0,
             max_tokens=2048
         )
         return response.choices[0].message.content

@@ -228,7 +228,7 @@ def run_evaluation(model_config, df, use_knowledge=False):
                 pass
 
         sampling_params = SamplingParams(
-            temperature=0.01,
+            temperature=0.0,
             top_p=0.95,
             max_tokens=2048,
             stop_token_ids=stop_tok_id
@@ -270,7 +270,7 @@ def run_evaluation(model_config, df, use_knowledge=False):
                     messages=chat_prompt,
                     max_tokens=4,
                     n=1,
-                    temperature=0.01,
+                    temperature=0.0,
                 )
                 content = response.choices[0].message.content.strip()
                 content = content.encode('utf-8', errors='ignore').decode('utf-8', errors='ignore')

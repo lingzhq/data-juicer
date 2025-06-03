@@ -89,7 +89,7 @@ class Evaluate():
                         model=self.eval_model_name,
                         messages=[{"role": "user", "content": prompt}],
                         max_tokens=2048,
-                        ttemperature=0.01
+                        ttemperature=0.0
                     )
                     generated_text = response.choices[0].message.content.strip()
                     

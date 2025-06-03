@@ -93,7 +93,7 @@ async def evaluate_safety(client, data_item):
         completion = await client.chat.completions.create(
             model=MODEL_NAME,
             messages=[{"role": "user", "content": prompt}],
-            temperature=0.01,
+            temperature=0.0,
             max_tokens=2048,
             extra_body={
                 "guided_json": EvaluationResult.model_json_schema(),

@@ -35,7 +35,7 @@ class Inference():
             response = await self.client.chat.completions.create(
                 model=self.infer_model,
                 messages=messages,
-                temperature=0.01,
+                temperature=0.0,
                 max_tokens=2048,
             )
             return response.choices[0].message.content
