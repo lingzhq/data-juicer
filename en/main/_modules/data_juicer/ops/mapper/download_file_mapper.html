@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../../genindex.html" /><link rel="search" title="Search" href="../../../../search.html" />
 
     <!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
-        <title>data_juicer.core.executor.ray_executor - data-juicer</title>
+        <title>data_juicer.ops.mapper.download_file_mapper - data-juicer</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
@@ -291,12 +291,12 @@
             <dt>Language</dt>
             <dd>
                 
-                <a href="../../../../../../en/main/_modules/data_juicer/core/executor/ray_executor.html"
+                <a href="../../../../../../en/main/_modules/data_juicer/ops/mapper/download_file_mapper.html"
                     class="active" >
                     English
                 </a>
                 
-                <a href="../../../../../../zh_CN/main/_modules/data_juicer/core/executor/ray_executor_ZH.html"
+                <a href="../../../../../../zh_CN/main/_modules/data_juicer/ops/mapper/download_file_mapper_ZH.html"
                     >
                     简体中文
                 </a>
@@ -309,7 +309,7 @@
         <div class="section">
             <dt>Version</dt>
             <dd>
-                    <a href="ray_executor.html">main</a>
+                    <a href="download_file_mapper.html">main</a>
             </dd>
         </div>
         
@@ -344,130 +344,164 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <h1>Source code for data_juicer.core.executor.ray_executor</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span>
+          <h1>Source code for data_juicer.ops.mapper.download_file_mapper</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os.path</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">osp</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">urllib.parse</span><span class="w"> </span><span class="kn">import</span> <span class="n">urlparse</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">jsonargparse</span><span class="w"> </span><span class="kn">import</span> <span class="n">Namespace</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">aiohttp</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">loguru</span><span class="w"> </span><span class="kn">import</span> <span class="n">logger</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">PositiveInt</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.core.adapter</span><span class="w"> </span><span class="kn">import</span> <span class="n">Adapter</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.core.data.dataset_builder</span><span class="w"> </span><span class="kn">import</span> <span class="n">DatasetBuilder</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.core.executor</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExecutorBase</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.ops</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_ops</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.ops.op_fusion</span><span class="w"> </span><span class="kn">import</span> <span class="n">fuse_operators</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.lazy_loader</span><span class="w"> </span><span class="kn">import</span> <span class="n">LazyLoader</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">data_juicer.utils.file_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">download_file</span><span class="p">,</span> <span class="n">is_remote_path</span>
 
-<span class="n">ray</span> <span class="o">=</span> <span class="n">LazyLoader</span><span class="p">(</span><span class="s1">&#39;ray&#39;</span><span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..base_op</span><span class="w"> </span><span class="kn">import</span> <span class="n">OPERATORS</span><span class="p">,</span> <span class="n">Mapper</span>
+
+<span class="n">OP_NAME</span> <span class="o">=</span> <span class="s2">&quot;download_file_mapper&quot;</span>
 
 
-<div class="viewcode-block" id="TempDirManager">
-<a class="viewcode-back" href="../../../../data_juicer.core.executor.html#data_juicer.core.executor.ray_executor.TempDirManager">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">TempDirManager</span><span class="p">:</span>
+<div class="viewcode-block" id="DownloadFileMapper">
+<a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.download_file_mapper.DownloadFileMapper">[docs]</a>
+<span class="nd">@OPERATORS</span><span class="o">.</span><span class="n">register_module</span><span class="p">(</span><span class="n">OP_NAME</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DownloadFileMapper</span><span class="p">(</span><span class="n">Mapper</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mapper to download url files to local files.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="TempDirManager.__init__">
-<a class="viewcode-back" href="../../../../data_juicer.core.executor.html#data_juicer.core.executor.ray_executor.TempDirManager.__init__">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tmp_dir</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">tmp_dir</span> <span class="o">=</span> <span class="n">tmp_dir</span></div>
+    <span class="n">_batched_op</span> <span class="o">=</span> <span class="kc">True</span>
 
-
-    <span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tmp_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tmp_dir</span><span class="p">):</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Removing tmp dir </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tmp_dir</span><span class="si">}</span><span class="s1"> ...&#39;</span><span class="p">)</span>
-            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tmp_dir</span><span class="p">)</span></div>
-
-
-
-<div class="viewcode-block" id="RayExecutor">
-<a class="viewcode-back" href="../../../../data_juicer.core.executor.html#data_juicer.core.executor.ray_executor.RayExecutor">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">RayExecutor</span><span class="p">(</span><span class="n">ExecutorBase</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Executor based on Ray.</span>
-
-<span class="sd">    Run Data-Juicer data processing in a distributed cluster.</span>
-
-<span class="sd">        1. Support Filter, Mapper and Exact Deduplicator operators for now.</span>
-<span class="sd">        2. Only support loading `.json` files.</span>
-<span class="sd">        3. Advanced functions such as checkpoint, tracer are not supported.</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-
-<div class="viewcode-block" id="RayExecutor.__init__">
-<a class="viewcode-back" href="../../../../data_juicer.core.executor.html#data_juicer.core.executor.ray_executor.RayExecutor.__init__">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cfg</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Namespace</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="DownloadFileMapper.__init__">
+<a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.download_file_mapper.DownloadFileMapper.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">save_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">download_field</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">30</span><span class="p">,</span>
+        <span class="n">max_concurrent</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+        <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialization method.</span>
 
-<span class="sd">        :param cfg: optional config dict.</span>
+<span class="sd">        :param save_dir: The directory to save downloaded files.</span>
+<span class="sd">        :param download_field: The filed name to get the url to download.</span>
+<span class="sd">        :param max_concurrent: Maximum concurrent downloads.</span>
+<span class="sd">        :param args: extra args</span>
+<span class="sd">        :param kwargs: extra args</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">executor_type</span> <span class="o">=</span> <span class="s1">&#39;ray&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">work_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">work_dir</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">adapter</span> <span class="o">=</span> <span class="n">Adapter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init_parameters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">remove_extra_parameters</span><span class="p">(</span><span class="nb">locals</span><span class="p">())</span>
 
-        <span class="c1"># init ray</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Initializing Ray ...&#39;</span><span class="p">)</span>
-        <span class="n">ray</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">ray_address</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">tmp_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">work_dir</span><span class="p">,</span> <span class="s1">&#39;.tmp&#39;</span><span class="p">,</span>
-                                    <span class="n">ray</span><span class="o">.</span><span class="n">get_runtime_context</span><span class="p">()</span><span class="o">.</span><span class="n">get_job_id</span><span class="p">())</span>
-
-        <span class="c1"># absolute path resolution logic</span>
-
-        <span class="c1"># init dataset builder</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">datasetbuilder</span> <span class="o">=</span> <span class="n">DatasetBuilder</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="p">,</span> <span class="n">executor_type</span><span class="o">=</span><span class="s1">&#39;ray&#39;</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">download_field</span> <span class="o">=</span> <span class="n">download_field</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span> <span class="o">=</span> <span class="n">save_dir</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timeout</span> <span class="o">=</span> <span class="n">timeout</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_concurrent</span> <span class="o">=</span> <span class="n">max_concurrent</span></div>
 
 
-<div class="viewcode-block" id="RayExecutor.run">
-<a class="viewcode-back" href="../../../../data_juicer.core.executor.html#data_juicer.core.executor.ray_executor.RayExecutor.run">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-            <span class="n">load_data_np</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PositiveInt</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">skip_return</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Running the dataset process pipeline</span>
+<div class="viewcode-block" id="DownloadFileMapper.download_files_async">
+<a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.download_file_mapper.DownloadFileMapper.download_files_async">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">download_files_async</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">urls</span><span class="p">,</span> <span class="n">save_dir</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
-<span class="sd">        :param load_data_np: number of workers when loading the dataset.</span>
-<span class="sd">        :param skip_return: skip return for API called.</span>
-<span class="sd">        :return: processed dataset.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># 1. load data</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Loading dataset with Ray...&#39;</span><span class="p">)</span>
-        <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasetbuilder</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">(</span><span class="n">num_proc</span><span class="o">=</span><span class="n">load_data_np</span><span class="p">)</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_download_file</span><span class="p">(</span>
+            <span class="n">session</span><span class="p">:</span> <span class="n">aiohttp</span><span class="o">.</span><span class="n">ClientSession</span><span class="p">,</span> <span class="n">semaphore</span><span class="p">:</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Semaphore</span><span class="p">,</span> <span class="n">idx</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">save_dir</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">urlparse</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+                <span class="n">save_path</span> <span class="o">=</span> <span class="n">osp</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">save_dir</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+                <span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;success&quot;</span>
+                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">save_path</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="n">idx</span><span class="p">,</span> <span class="n">save_path</span><span class="p">,</span> <span class="n">status</span><span class="p">,</span> <span class="kc">None</span>
 
-        <span class="c1"># 2. extract processes</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Preparing process operators...&#39;</span><span class="p">)</span>
-        <span class="n">ops</span> <span class="o">=</span> <span class="n">load_ops</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">process</span><span class="p">)</span>
+                <span class="k">async</span> <span class="k">with</span> <span class="n">semaphore</span><span class="p">:</span>
+                    <span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">download_file</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">save_path</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;failed&quot;</span>
+                <span class="n">response</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+                <span class="n">save_path</span> <span class="o">=</span> <span class="kc">None</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">op_fusion</span><span class="p">:</span>
-            <span class="n">probe_res</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">fusion_strategy</span> <span class="o">==</span> <span class="s1">&#39;probe&#39;</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Probe the OP speed for OP reordering...&#39;</span><span class="p">)</span>
-                <span class="n">probe_res</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">adapter</span><span class="o">.</span><span class="n">probe_small_batch</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">ops</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">idx</span><span class="p">,</span> <span class="n">save_path</span><span class="p">,</span> <span class="n">status</span><span class="p">,</span> <span class="n">response</span>
 
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Start OP fusion and reordering with strategy &#39;</span>
-                        <span class="sa">f</span><span class="s1">&#39;[</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">fusion_strategy</span><span class="si">}</span><span class="s1">]...&#39;</span><span class="p">)</span>
-            <span class="n">ops</span> <span class="o">=</span> <span class="n">fuse_operators</span><span class="p">(</span><span class="n">ops</span><span class="p">,</span> <span class="n">probe_res</span><span class="p">)</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">run_downloads</span><span class="p">(</span><span class="n">urls</span><span class="p">,</span> <span class="n">save_dir</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="n">semaphore</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Semaphore</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_concurrent</span><span class="p">)</span>
+            <span class="k">async</span> <span class="k">with</span> <span class="n">aiohttp</span><span class="o">.</span><span class="n">ClientSession</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+                <span class="n">tasks</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="n">_download_file</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">semaphore</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">save_dir</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">url</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">urls</span><span class="p">)</span>
+                <span class="p">]</span>
+                <span class="k">return</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="o">*</span><span class="n">tasks</span><span class="p">)</span>
 
-        <span class="k">with</span> <span class="n">TempDirManager</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tmp_dir</span><span class="p">):</span>
-            <span class="c1"># 3. data process</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Processing data...&#39;</span><span class="p">)</span>
-            <span class="n">tstart</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-            <span class="n">dataset</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">ops</span><span class="p">)</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">run_downloads</span><span class="p">(</span><span class="n">urls</span><span class="p">,</span> <span class="n">save_dir</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span>
+        <span class="n">results</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
-            <span class="c1"># 4. data export</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Exporting dataset to disk...&#39;</span><span class="p">)</span>
-            <span class="n">dataset</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">write_json</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">export_path</span><span class="p">,</span> <span class="n">force_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-            <span class="n">tend</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;All Ops are done in </span><span class="si">{</span><span class="n">tend</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">tstart</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1">s.&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">results</span></div>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">skip_return</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">dataset</span></div>
+
+<div class="viewcode-block" id="DownloadFileMapper.download_nested_urls">
+<a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.download_file_mapper.DownloadFileMapper.download_nested_urls">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">download_nested_urls</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nested_urls</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]],</span> <span class="n">save_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">flat_urls</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">structure_info</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># save as original index, sub index</span>
+
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">urls</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">nested_urls</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">urls</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">sub_idx</span><span class="p">,</span> <span class="n">url</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">urls</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">is_remote_path</span><span class="p">(</span><span class="n">url</span><span class="p">):</span>
+                        <span class="n">flat_urls</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+                        <span class="n">structure_info</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">idx</span><span class="p">,</span> <span class="n">sub_idx</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">is_remote_path</span><span class="p">(</span><span class="n">urls</span><span class="p">):</span>
+                    <span class="n">flat_urls</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">urls</span><span class="p">)</span>
+                    <span class="n">structure_info</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">idx</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>  <span class="c1"># -1 means single str element</span>
+
+        <span class="n">download_results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">download_files_async</span><span class="p">(</span>
+            <span class="n">flat_urls</span><span class="p">,</span>
+            <span class="n">save_dir</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">keep_failed_url</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">keep_failed_url</span><span class="p">:</span>
+            <span class="n">reconstructed</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">nested_urls</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">reconstructed</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">nested_urls</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                    <span class="n">reconstructed</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">item</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">reconstructed</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+
+        <span class="n">failed_info</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">save_path</span><span class="p">,</span> <span class="n">status</span><span class="p">,</span> <span class="n">response</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">download_results</span><span class="p">):</span>
+            <span class="n">orig_idx</span><span class="p">,</span> <span class="n">sub_idx</span> <span class="o">=</span> <span class="n">structure_info</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">status</span> <span class="o">!=</span> <span class="s2">&quot;success&quot;</span><span class="p">:</span>
+                <span class="n">save_path</span> <span class="o">=</span> <span class="n">flat_urls</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="n">failed_info</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+
+            <span class="c1"># TODO: add download stats</span>
+            <span class="k">if</span> <span class="n">sub_idx</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                <span class="n">reconstructed</span><span class="p">[</span><span class="n">orig_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">save_path</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">reconstructed</span><span class="p">[</span><span class="n">orig_idx</span><span class="p">][</span><span class="n">sub_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">save_path</span>
+
+        <span class="k">return</span> <span class="n">reconstructed</span><span class="p">,</span> <span class="n">failed_info</span></div>
+
+
+<div class="viewcode-block" id="DownloadFileMapper.process_batched">
+<a class="viewcode-back" href="../../../../data_juicer.ops.mapper.html#data_juicer.ops.mapper.download_file_mapper.DownloadFileMapper.process_batched">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">process_batched</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samples</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">download_field</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">samples</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">samples</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">download_field</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="n">samples</span>
+
+        <span class="n">batch_nested_urls</span> <span class="o">=</span> <span class="n">samples</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">download_field</span><span class="p">]</span>
+
+        <span class="n">reconstructed</span><span class="p">,</span> <span class="n">failed_info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">download_nested_urls</span><span class="p">(</span><span class="n">batch_nested_urls</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span><span class="p">)</span>
+
+        <span class="n">samples</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">download_field</span><span class="p">]</span> <span class="o">=</span> <span class="n">reconstructed</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">failed_info</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed files:</span><span class="se">\n</span><span class="si">{</span><span class="n">failed_info</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">samples</span></div>
 </div>
 
 </pre></div>
