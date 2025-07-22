@@ -5,12 +5,12 @@
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="data_juicer.config package" href="data_juicer.config.html" /><link rel="prev" title="data_juicer.ops.selector package" href="data_juicer.ops.selector.html" />
 
-    <!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
+    <!-- Generated with Sphinx 8.1.3 and Furo 2025.07.19 -->
         <title>data_juicer.analysis package - data-juicer</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=25af2a20" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=302659d7" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
     <link rel="stylesheet" type="text/css" href="_static/sidebar-menu.css?v=dcc41d8a" />
     
     
@@ -18,20 +18,20 @@
 
 <style>
   body {
-    --color-code-background: #f8f8f8;
-  --color-code-foreground: black;
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
   
   }
   @media not print {
     body[data-theme="dark"] {
-      --color-code-background: #202020;
-  --color-code-foreground: #d0d0d0;
+      --color-code-background: #2b2b2b;
+  --color-code-foreground: #f8f8f2;
   
     }
     @media (prefers-color-scheme: dark) {
       body:not([data-theme="light"]) {
-        --color-code-background: #202020;
-  --color-code-foreground: #d0d0d0;
+        --color-code-background: #2b2b2b;
+  --color-code-foreground: #f8f8f2;
   
       }
     }
@@ -192,7 +192,6 @@
     <div class="sidebar-container">
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
-  
   
   <span class="sidebar-brand-text">data-juicer</span>
   
@@ -356,8 +355,37 @@
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">¶</a></h2>
 </section>
-<section id="data-juicer-analysis-collector-module">
-<h2>data_juicer.analysis.collector module<a class="headerlink" href="#data-juicer-analysis-collector-module" title="Link to this heading">¶</a></h2>
+<section id="module-data_juicer.analysis.collector">
+<span id="data-juicer-analysis-collector-module"></span><h2>data_juicer.analysis.collector module<a class="headerlink" href="#module-data_juicer.analysis.collector" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="data_juicer.analysis.collector.TextTokenDistCollector">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.analysis.collector.</span></span><span class="sig-name descname"><span class="pre">TextTokenDistCollector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/analysis/collector.html#TextTokenDistCollector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.analysis.collector.TextTokenDistCollector" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Tokenize and collect distribution of tokens for given
+dataset with a specified tokenizer.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.analysis.collector.TextTokenDistCollector.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/analysis/collector.html#TextTokenDistCollector.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.analysis.collector.TextTokenDistCollector.__init__" title="Link to this definition">¶</a></dt>
+<dd><p>Initialization method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>tokenizer</strong> – tokenizer name on huggingface</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_juicer.analysis.collector.TextTokenDistCollector.collect">
+<span class="sig-name descname"><span class="pre">collect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_proc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Categorical</span></span></span><a class="reference internal" href="_modules/data_juicer/analysis/collector.html#TextTokenDistCollector.collect"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.analysis.collector.TextTokenDistCollector.collect" title="Link to this definition">¶</a></dt>
+<dd><p>Tokenize and collect tokens distribution of input dataset
+:param data_path: path to input dataset.
+:param text_key: field keys that will be considered into token counts.
+:param num_proc: number of processes to count tokens.
+:return: token distribution.</p>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 <section id="module-data_juicer.analysis.column_wise_analysis">
 <span id="data-juicer-analysis-column-wise-analysis-module"></span><h2>data_juicer.analysis.column_wise_analysis module<a class="headerlink" href="#module-data_juicer.analysis.column_wise_analysis" title="Link to this heading">¶</a></h2>
@@ -1131,7 +1159,14 @@ method of pandas.</p>
             <ul>
 <li><a class="reference internal" href="#">data_juicer.analysis package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#data-juicer-analysis-collector-module">data_juicer.analysis.collector module</a></li>
+<li><a class="reference internal" href="#module-data_juicer.analysis.collector">data_juicer.analysis.collector module</a><ul>
+<li><a class="reference internal" href="#data_juicer.analysis.collector.TextTokenDistCollector"><code class="docutils literal notranslate"><span class="pre">TextTokenDistCollector</span></code></a><ul>
+<li><a class="reference internal" href="#data_juicer.analysis.collector.TextTokenDistCollector.__init__"><code class="docutils literal notranslate"><span class="pre">TextTokenDistCollector.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#data_juicer.analysis.collector.TextTokenDistCollector.collect"><code class="docutils literal notranslate"><span class="pre">TextTokenDistCollector.collect()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li><a class="reference internal" href="#module-data_juicer.analysis.column_wise_analysis">data_juicer.analysis.column_wise_analysis module</a><ul>
 <li><a class="reference internal" href="#data_juicer.analysis.column_wise_analysis.get_row_col"><code class="docutils literal notranslate"><span class="pre">get_row_col()</span></code></a></li>
 <li><a class="reference internal" href="#data_juicer.analysis.column_wise_analysis.ColumnWiseAnalysis"><code class="docutils literal notranslate"><span class="pre">ColumnWiseAnalysis</span></code></a><ul>
@@ -1251,10 +1286,10 @@ method of pandas.</p>
     </aside>
   </div>
 </div>
-<script src="_static/documentation_options.js?v=9172181d"></script>
+<script src="_static/documentation_options.js?v=350a9c04"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="_static/scripts/furo.js?v=5fa4622c"></script>
+    <script src="_static/scripts/furo.js?v=46bd48cc"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="_static/copybutton.js?v=f281be69"></script>
     </body>

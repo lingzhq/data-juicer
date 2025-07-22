@@ -5,12 +5,12 @@
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="data_juicer.ops.aggregator package" href="data_juicer.ops.aggregator.html" /><link rel="prev" title="data_juicer.core.executor package" href="data_juicer.core.executor.html" />
 
-    <!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
+    <!-- Generated with Sphinx 8.1.3 and Furo 2025.07.19 -->
         <title>data_juicer.ops package - data-juicer</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d111a655" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=25af2a20" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=302659d7" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
     <link rel="stylesheet" type="text/css" href="_static/sidebar-menu.css?v=dcc41d8a" />
     
     
@@ -18,20 +18,20 @@
 
 <style>
   body {
-    --color-code-background: #f8f8f8;
-  --color-code-foreground: black;
+    --color-code-background: #f2f2f2;
+  --color-code-foreground: #1e1e1e;
   
   }
   @media not print {
     body[data-theme="dark"] {
-      --color-code-background: #202020;
-  --color-code-foreground: #d0d0d0;
+      --color-code-background: #2b2b2b;
+  --color-code-foreground: #f8f8f2;
   
     }
     @media (prefers-color-scheme: dark) {
       body:not([data-theme="light"]) {
-        --color-code-background: #202020;
-  --color-code-foreground: #d0d0d0;
+        --color-code-background: #2b2b2b;
+  --color-code-foreground: #f8f8f2;
   
       }
     }
@@ -192,7 +192,6 @@
     <div class="sidebar-container">
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
-  
   
   <span class="sidebar-brand-text">data-juicer</span>
   
@@ -482,7 +481,86 @@
 <li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.helper_func.split_text_by_punctuation"><code class="docutils literal notranslate"><span class="pre">split_text_by_punctuation()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.common.html#data-juicer-ops-common-prompt2prompt-pipeline-module">data_juicer.ops.common.prompt2prompt_pipeline module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.common.html#module-data_juicer.ops.common.prompt2prompt_pipeline">data_juicer.ops.common.prompt2prompt_pipeline module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.prompt2prompt_pipeline.rescale_noise_cfg"><code class="docutils literal notranslate"><span class="pre">rescale_noise_cfg()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.prompt2prompt_pipeline.Prompt2PromptPipeline"><code class="docutils literal notranslate"><span class="pre">Prompt2PromptPipeline</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.prompt2prompt_pipeline.Prompt2PromptPipeline.check_inputs"><code class="docutils literal notranslate"><span class="pre">Prompt2PromptPipeline.check_inputs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.prompt2prompt_pipeline.Prompt2PromptPipeline.register_attention_control"><code class="docutils literal notranslate"><span class="pre">Prompt2PromptPipeline.register_attention_control()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.prompt2prompt_pipeline.P2PCrossAttnProcessor"><code class="docutils literal notranslate"><span class="pre">P2PCrossAttnProcessor</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.prompt2prompt_pipeline.P2PCrossAttnProcessor.__init__"><code class="docutils literal notranslate"><span class="pre">P2PCrossAttnProcessor.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.prompt2prompt_pipeline.AttentionControl"><code class="docutils literal notranslate"><span class="pre">AttentionControl</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.prompt2prompt_pipeline.AttentionControl.step_callback"><code class="docutils literal notranslate"><span class="pre">AttentionControl.step_callback()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.prompt2prompt_pipeline.AttentionControl.between_steps"><code class="docutils literal notranslate"><span class="pre">AttentionControl.between_steps()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.prompt2prompt_pipeline.AttentionControl.num_uncond_att_layers"><code class="docutils literal notranslate"><span class="pre">AttentionControl.num_uncond_att_layers</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.prompt2prompt_pipeline.AttentionControl.forward"><code class="docutils literal notranslate"><span class="pre">AttentionControl.forward()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.prompt2prompt_pipeline.AttentionControl.reset"><code class="docutils literal notranslate"><span class="pre">AttentionControl.reset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.prompt2prompt_pipeline.AttentionControl.__init__"><code class="docutils literal notranslate"><span class="pre">AttentionControl.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.prompt2prompt_pipeline.create_controller"><code class="docutils literal notranslate"><span class="pre">create_controller()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.prompt2prompt_pipeline.EmptyControl"><code class="docutils literal notranslate"><span class="pre">EmptyControl</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.prompt2prompt_pipeline.EmptyControl.forward"><code class="docutils literal notranslate"><span class="pre">EmptyControl.forward()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.prompt2prompt_pipeline.AttentionStore"><code class="docutils literal notranslate"><span class="pre">AttentionStore</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.prompt2prompt_pipeline.AttentionStore.get_empty_store"><code class="docutils literal notranslate"><span class="pre">AttentionStore.get_empty_store()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.prompt2prompt_pipeline.AttentionStore.forward"><code class="docutils literal notranslate"><span class="pre">AttentionStore.forward()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.prompt2prompt_pipeline.AttentionStore.between_steps"><code class="docutils literal notranslate"><span class="pre">AttentionStore.between_steps()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.prompt2prompt_pipeline.AttentionStore.get_average_attention"><code class="docutils literal notranslate"><span class="pre">AttentionStore.get_average_attention()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.prompt2prompt_pipeline.AttentionStore.reset"><code class="docutils literal notranslate"><span class="pre">AttentionStore.reset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.prompt2prompt_pipeline.AttentionStore.__init__"><code class="docutils literal notranslate"><span class="pre">AttentionStore.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.prompt2prompt_pipeline.LocalBlend"><code class="docutils literal notranslate"><span class="pre">LocalBlend</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.prompt2prompt_pipeline.LocalBlend.__init__"><code class="docutils literal notranslate"><span class="pre">LocalBlend.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.prompt2prompt_pipeline.AttentionControlEdit"><code class="docutils literal notranslate"><span class="pre">AttentionControlEdit</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.prompt2prompt_pipeline.AttentionControlEdit.step_callback"><code class="docutils literal notranslate"><span class="pre">AttentionControlEdit.step_callback()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.prompt2prompt_pipeline.AttentionControlEdit.replace_self_attention"><code class="docutils literal notranslate"><span class="pre">AttentionControlEdit.replace_self_attention()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.prompt2prompt_pipeline.AttentionControlEdit.replace_cross_attention"><code class="docutils literal notranslate"><span class="pre">AttentionControlEdit.replace_cross_attention()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.prompt2prompt_pipeline.AttentionControlEdit.forward"><code class="docutils literal notranslate"><span class="pre">AttentionControlEdit.forward()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.prompt2prompt_pipeline.AttentionControlEdit.__init__"><code class="docutils literal notranslate"><span class="pre">AttentionControlEdit.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.prompt2prompt_pipeline.AttentionReplace"><code class="docutils literal notranslate"><span class="pre">AttentionReplace</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.prompt2prompt_pipeline.AttentionReplace.replace_cross_attention"><code class="docutils literal notranslate"><span class="pre">AttentionReplace.replace_cross_attention()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.prompt2prompt_pipeline.AttentionReplace.__init__"><code class="docutils literal notranslate"><span class="pre">AttentionReplace.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.prompt2prompt_pipeline.AttentionRefine"><code class="docutils literal notranslate"><span class="pre">AttentionRefine</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.prompt2prompt_pipeline.AttentionRefine.replace_cross_attention"><code class="docutils literal notranslate"><span class="pre">AttentionRefine.replace_cross_attention()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.prompt2prompt_pipeline.AttentionRefine.__init__"><code class="docutils literal notranslate"><span class="pre">AttentionRefine.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.prompt2prompt_pipeline.AttentionReweight"><code class="docutils literal notranslate"><span class="pre">AttentionReweight</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.prompt2prompt_pipeline.AttentionReweight.replace_cross_attention"><code class="docutils literal notranslate"><span class="pre">AttentionReweight.replace_cross_attention()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.prompt2prompt_pipeline.AttentionReweight.__init__"><code class="docutils literal notranslate"><span class="pre">AttentionReweight.__init__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.prompt2prompt_pipeline.update_alpha_time_word"><code class="docutils literal notranslate"><span class="pre">update_alpha_time_word()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.prompt2prompt_pipeline.get_time_words_attention_alpha"><code class="docutils literal notranslate"><span class="pre">get_time_words_attention_alpha()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.prompt2prompt_pipeline.get_word_inds"><code class="docutils literal notranslate"><span class="pre">get_word_inds()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.prompt2prompt_pipeline.get_replacement_mapper_"><code class="docutils literal notranslate"><span class="pre">get_replacement_mapper_()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.prompt2prompt_pipeline.get_replacement_mapper"><code class="docutils literal notranslate"><span class="pre">get_replacement_mapper()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.prompt2prompt_pipeline.get_equalizer"><code class="docutils literal notranslate"><span class="pre">get_equalizer()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.prompt2prompt_pipeline.ScoreParams"><code class="docutils literal notranslate"><span class="pre">ScoreParams</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.prompt2prompt_pipeline.ScoreParams.__init__"><code class="docutils literal notranslate"><span class="pre">ScoreParams.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.prompt2prompt_pipeline.ScoreParams.mis_match_char"><code class="docutils literal notranslate"><span class="pre">ScoreParams.mis_match_char()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.prompt2prompt_pipeline.get_matrix"><code class="docutils literal notranslate"><span class="pre">get_matrix()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.prompt2prompt_pipeline.get_traceback_matrix"><code class="docutils literal notranslate"><span class="pre">get_traceback_matrix()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.prompt2prompt_pipeline.global_align"><code class="docutils literal notranslate"><span class="pre">global_align()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.prompt2prompt_pipeline.get_aligned_sequences"><code class="docutils literal notranslate"><span class="pre">get_aligned_sequences()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.prompt2prompt_pipeline.get_mapper"><code class="docutils literal notranslate"><span class="pre">get_mapper()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.prompt2prompt_pipeline.get_refinement_mapper"><code class="docutils literal notranslate"><span class="pre">get_refinement_mapper()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.common.html#module-data_juicer.ops.common.special_characters">data_juicer.ops.common.special_characters module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="data_juicer.ops.common.html#module-data_juicer.ops.common">Module contents</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="data_juicer.ops.common.html#data_juicer.ops.common.get_sentences_from_document"><code class="docutils literal notranslate"><span class="pre">get_sentences_from_document()</span></code></a></li>
@@ -2990,6 +3068,8 @@ to be processed</p></li>
 to be processed</p></li>
 <li><p><strong>video_key</strong> – the key name of field that stores sample video list
 to be processed</p></li>
+<li><p><strong>image_bytes_key</strong> – the key name of field that stores sample image bytes list
+to be processed</p></li>
 <li><p><strong>query_key</strong> – the key name of field that stores sample queries</p></li>
 <li><p><strong>response_key</strong> – the key name of field that stores responses</p></li>
 <li><p><strong>history_key</strong> – the key name of field that stores history of
@@ -3068,6 +3148,8 @@ to be processed</p></li>
 to be processed</p></li>
 <li><p><strong>video_key</strong> – the key name of field that stores sample video list
 to be processed</p></li>
+<li><p><strong>image_bytes_key</strong> – the key name of field that stores sample image bytes list
+to be processed</p></li>
 <li><p><strong>query_key</strong> – the key name of field that stores sample queries</p></li>
 <li><p><strong>response_key</strong> – the key name of field that stores responses</p></li>
 <li><p><strong>history_key</strong> – the key name of field that stores history of
@@ -3121,6 +3203,8 @@ to be processed</p></li>
 <li><p><strong>audio_key</strong> – the key name of field that stores sample audio list
 to be processed</p></li>
 <li><p><strong>video_key</strong> – the key name of field that stores sample video list
+to be processed</p></li>
+<li><p><strong>image_bytes_key</strong> – the key name of field that stores sample image bytes list
 to be processed</p></li>
 <li><p><strong>query_key</strong> – the key name of field that stores sample queries</p></li>
 <li><p><strong>response_key</strong> – the key name of field that stores responses</p></li>
@@ -3200,6 +3284,8 @@ to be processed</p></li>
 to be processed</p></li>
 <li><p><strong>video_key</strong> – the key name of field that stores sample video list
 to be processed</p></li>
+<li><p><strong>image_bytes_key</strong> – the key name of field that stores sample image bytes list
+to be processed</p></li>
 <li><p><strong>query_key</strong> – the key name of field that stores sample queries</p></li>
 <li><p><strong>response_key</strong> – the key name of field that stores responses</p></li>
 <li><p><strong>history_key</strong> – the key name of field that stores history of
@@ -3267,6 +3353,8 @@ to be processed</p></li>
 to be processed</p></li>
 <li><p><strong>video_key</strong> – the key name of field that stores sample video list
 to be processed</p></li>
+<li><p><strong>image_bytes_key</strong> – the key name of field that stores sample image bytes list
+to be processed</p></li>
 <li><p><strong>query_key</strong> – the key name of field that stores sample queries</p></li>
 <li><p><strong>response_key</strong> – the key name of field that stores responses</p></li>
 <li><p><strong>history_key</strong> – the key name of field that stores history of
@@ -3316,6 +3404,8 @@ to be processed</p></li>
 to be processed</p></li>
 <li><p><strong>video_key</strong> – the key name of field that stores sample video list
 to be processed</p></li>
+<li><p><strong>image_bytes_key</strong> – the key name of field that stores sample image bytes list
+to be processed</p></li>
 <li><p><strong>query_key</strong> – the key name of field that stores sample queries</p></li>
 <li><p><strong>response_key</strong> – the key name of field that stores responses</p></li>
 <li><p><strong>history_key</strong> – the key name of field that stores history of
@@ -3364,6 +3454,8 @@ to be processed</p></li>
 <li><p><strong>audio_key</strong> – the key name of field that stores sample audio list
 to be processed</p></li>
 <li><p><strong>video_key</strong> – the key name of field that stores sample video list
+to be processed</p></li>
+<li><p><strong>image_bytes_key</strong> – the key name of field that stores sample image bytes list
 to be processed</p></li>
 <li><p><strong>query_key</strong> – the key name of field that stores sample queries</p></li>
 <li><p><strong>response_key</strong> – the key name of field that stores responses</p></li>
@@ -3779,14 +3871,14 @@ definitions and objects.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="data_juicer.ops.op_fusion.GeneralFusedOP">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_juicer.ops.op_fusion.</span></span><span class="sig-name descname"><span class="pre">GeneralFusedOP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fused_op_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/op_fusion.html#GeneralFusedOP"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.op_fusion.GeneralFusedOP" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#data_juicer.ops.base_op.OP" title="data_juicer.ops.base_op.OP"><code class="xref py py-class docutils literal notranslate"><span class="pre">OP</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="#data_juicer.ops.base_op.Mapper" title="data_juicer.ops.base_op.Mapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">Mapper</span></code></a></p>
 <p>An explicitly fused operator designed to execute multiple sequential
 operations (OPs) on the same batch, enabling fine-grained control over
 data processing.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_juicer.ops.op_fusion.GeneralFusedOP.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fused_op_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_juicer/ops/op_fusion.html#GeneralFusedOP.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_juicer.ops.op_fusion.GeneralFusedOP.__init__" title="Link to this definition">¶</a></dt>
-<dd><p>Base class of operators.</p>
+<dd><p>Base class that conducts data editing.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -3798,13 +3890,12 @@ to be processed</p></li>
 to be processed</p></li>
 <li><p><strong>video_key</strong> – the key name of field that stores sample video list
 to be processed</p></li>
+<li><p><strong>image_bytes_key</strong> – the key name of field that stores sample image bytes list
+to be processed</p></li>
 <li><p><strong>query_key</strong> – the key name of field that stores sample queries</p></li>
 <li><p><strong>response_key</strong> – the key name of field that stores responses</p></li>
 <li><p><strong>history_key</strong> – the key name of field that stores history of
 queries and responses</p></li>
-<li><p><strong>index_key</strong> – index the samples before process if not None</p></li>
-<li><p><strong>batch_size</strong> – the batch size for processing</p></li>
-<li><p><strong>work_dir</strong> – the working directory for this operator</p></li>
 </ul>
 </dd>
 </dl>
@@ -3858,6 +3949,8 @@ to be processed</p></li>
 <li><p><strong>audio_key</strong> – the key name of field that stores sample audio list
 to be processed</p></li>
 <li><p><strong>video_key</strong> – the key name of field that stores sample video list
+to be processed</p></li>
+<li><p><strong>image_bytes_key</strong> – the key name of field that stores sample image bytes list
 to be processed</p></li>
 <li><p><strong>query_key</strong> – the key name of field that stores sample queries</p></li>
 <li><p><strong>response_key</strong> – the key name of field that stores responses</p></li>
@@ -3937,6 +4030,8 @@ to be processed</p></li>
 to be processed</p></li>
 <li><p><strong>video_key</strong> – the key name of field that stores sample video list
 to be processed</p></li>
+<li><p><strong>image_bytes_key</strong> – the key name of field that stores sample image bytes list
+to be processed</p></li>
 <li><p><strong>query_key</strong> – the key name of field that stores sample queries</p></li>
 <li><p><strong>response_key</strong> – the key name of field that stores responses</p></li>
 <li><p><strong>history_key</strong> – the key name of field that stores history of
@@ -3990,6 +4085,8 @@ to be processed</p></li>
 <li><p><strong>audio_key</strong> – the key name of field that stores sample audio list
 to be processed</p></li>
 <li><p><strong>video_key</strong> – the key name of field that stores sample video list
+to be processed</p></li>
+<li><p><strong>image_bytes_key</strong> – the key name of field that stores sample image bytes list
 to be processed</p></li>
 <li><p><strong>query_key</strong> – the key name of field that stores sample queries</p></li>
 <li><p><strong>response_key</strong> – the key name of field that stores responses</p></li>
@@ -4058,6 +4155,8 @@ to be processed</p></li>
 to be processed</p></li>
 <li><p><strong>video_key</strong> – the key name of field that stores sample video list
 to be processed</p></li>
+<li><p><strong>image_bytes_key</strong> – the key name of field that stores sample image bytes list
+to be processed</p></li>
 <li><p><strong>query_key</strong> – the key name of field that stores sample queries</p></li>
 <li><p><strong>response_key</strong> – the key name of field that stores responses</p></li>
 <li><p><strong>history_key</strong> – the key name of field that stores history of
@@ -4107,6 +4206,8 @@ to be processed</p></li>
 to be processed</p></li>
 <li><p><strong>video_key</strong> – the key name of field that stores sample video list
 to be processed</p></li>
+<li><p><strong>image_bytes_key</strong> – the key name of field that stores sample image bytes list
+to be processed</p></li>
 <li><p><strong>query_key</strong> – the key name of field that stores sample queries</p></li>
 <li><p><strong>response_key</strong> – the key name of field that stores responses</p></li>
 <li><p><strong>history_key</strong> – the key name of field that stores history of
@@ -4155,6 +4256,8 @@ to be processed</p></li>
 <li><p><strong>audio_key</strong> – the key name of field that stores sample audio list
 to be processed</p></li>
 <li><p><strong>video_key</strong> – the key name of field that stores sample video list
+to be processed</p></li>
+<li><p><strong>image_bytes_key</strong> – the key name of field that stores sample image bytes list
 to be processed</p></li>
 <li><p><strong>query_key</strong> – the key name of field that stores sample queries</p></li>
 <li><p><strong>response_key</strong> – the key name of field that stores responses</p></li>
@@ -4405,10 +4508,10 @@ the input must be the output of some Grouper OP.</p>
     </aside>
   </div>
 </div>
-<script src="_static/documentation_options.js?v=9172181d"></script>
+<script src="_static/documentation_options.js?v=350a9c04"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="_static/scripts/furo.js?v=5fa4622c"></script>
+    <script src="_static/scripts/furo.js?v=46bd48cc"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="_static/copybutton.js?v=f281be69"></script>
     </body>
