@@ -57,7 +57,7 @@ class RayExecutor(ExecutorBase):
 
         # init ray
         logger.info("Initializing Ray ...")
-        ray.init(self.cfg.ray_address)
+        ray.init(self.cfg.ray_address, ignore_reinit_error=True)
         self.tmp_dir = os.path.join(self.work_dir, ".tmp", ray.get_runtime_context().get_job_id())
 
         # absolute path resolution logic
@@ -68,8 +68,10 @@ class RayExecutor(ExecutorBase):
         logger.info("Preparing exporter...")
         self.exporter = RayExporter(
             self.cfg.export_path,
+            self.cfg.export_type,
             keep_stats_in_res_ds=self.cfg.keep_stats_in_res_ds,
             keep_hashes_in_res_ds=self.cfg.keep_hashes_in_res_ds,
+            **self.cfg.export_extra_args,
         )
 
     def run(self, load_data_np: Optional[PositiveInt] = None, skip_return=False):
@@ -90,13 +92,8 @@ class RayExecutor(ExecutorBase):
         ops = load_ops(self.cfg.process)
 
         if self.cfg.op_fusion:
-            probe_res = None
-            if self.cfg.fusion_strategy == "probe":
-                logger.info("Probe the OP speed for OP reordering...")
-                probe_res, _ = self.adapter.probe_small_batch(dataset, ops)
-
             logger.info(f"Start OP fusion and reordering with strategy " f"[{self.cfg.fusion_strategy}]...")
-            ops = fuse_operators(ops, probe_res)
+            ops = fuse_operators(ops)
 
         with TempDirManager(self.tmp_dir):
             # 3. data process

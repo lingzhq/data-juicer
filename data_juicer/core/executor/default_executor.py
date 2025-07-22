@@ -72,11 +72,13 @@ class DefaultExecutor(ExecutorBase):
         logger.info("Preparing exporter...")
         self.exporter = Exporter(
             self.cfg.export_path,
+            self.cfg.export_type,
             self.cfg.export_shard_size,
             self.cfg.export_in_parallel,
             self.cfg.np,
             keep_stats_in_res_ds=self.cfg.keep_stats_in_res_ds,
             keep_hashes_in_res_ds=self.cfg.keep_hashes_in_res_ds,
+            **self.cfg.export_extra_args,
         )
 
         # setup tracer
@@ -198,13 +200,11 @@ class DefaultExecutor(ExecutorBase):
         elif self.cfg.use_checkpoint and self.ckpt_manager.ckpt_available:
             logger.info("Loading dataset from checkpoint...")
             dataset = self.ckpt_manager.load_ckpt()
-        elif hasattr(self, "formatter"):
-            logger.info("Loading dataset from data formatter...")
+        else:
+            logger.info("Loading dataset from dataset builder...")
             if load_data_np is None:
                 load_data_np = self.cfg.np
-            dataset = self.formatter.load_dataset(load_data_np, self.cfg)
-        else:
-            raise ValueError("No dataset available to sample from.")
+            dataset = self.dataset_builder.load_dataset(num_proc=load_data_np)
 
         # Perform sampling based on the specified algorithm
         if sample_algo == "uniform":
