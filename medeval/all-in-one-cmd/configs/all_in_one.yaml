@@ -1,0 +1,10 @@
+type: med_evaluator
+med_task: 'all_in_one'
+
+infer_concurrency: 16
+eval_concurrency: 16
+flames_batch_size: 4
+
+env_manager: 'conda'
+evalscope_type: 'config'
+radar_parser: 'configs/med_radar.yaml'

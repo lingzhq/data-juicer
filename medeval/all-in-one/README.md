@@ -13,7 +13,7 @@
 - configs/perf.py: INFER_MODEL_PATH
 
 ## Data
-Currently `all_in_one.yaml` uses data/med_data_sub to test the completeness of the process.
+Currently `all_in_one.yaml` uses `data/med_data_sub` to test the completeness of the process.
 
 ## Run
 Start the vLLM first.
