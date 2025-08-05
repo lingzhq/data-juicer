@@ -89,7 +89,7 @@ class Evaluate():
                         model=self.eval_model_name,
                         messages=[{"role": "user", "content": prompt}],
                         max_tokens=2048,
-                        ttemperature=0.0
+                        temperature=0.0
                     )
                     generated_text = response.choices[0].message.content.strip()
                     
@@ -101,22 +101,38 @@ class Evaluate():
                         json_str = json_match.group(1)
                         generated_json = json.loads(json_str)
                         
-                        if len(generated_json["judge result"]) == check_num:
+                        is_valid = False
+                        if "judge result" in generated_json and isinstance(generated_json["judge result"], list):
+                            if len(generated_json["judge result"]) == check_num:
+                                is_valid = True
+                                for item in generated_json["judge result"]:
+                                    if not (isinstance(item, dict) and "judgement" in item and "reason" in item):
+                                        is_valid = False
+                                        print(f"Retry: Invalid item in 'judge result': {item}")
+                                        break
+                        
+                        if is_valid:
                             conv_data[conv_turn_idx]["judge result"] = generated_json["judge result"]
                             return True
                         else:
-                            print(f"Retry: Expected {check_num} items, got {len(generated_json['judge result'])}")
+                            print(f"Retry: Validation failed. Expected {check_num} items with full structure, got something else.")
                     else:
-                        print(f"JSON not found in response: {generated_text}")
-                
+                        print(f"Retry: JSON not found in response: {generated_text}")
+
                 except json.JSONDecodeError as e:
-                    print(f"JSON decode error: {e}, content: {generated_text}")
+                    print(f"Retry: JSON decode error: {e}, content: {generated_text}")
                 except Exception as e:
-                    print(f"API request failed: {e}")
-                
+                    print(f"Retry: API request failed: {e}")
+
                 try_time += 1
             
-            conv_data[conv_turn_idx]["judge result"] = {"error": f"Failed after {self.max_try} attempts"}
+            error_msg = f"Failed to get a valid evaluation after {self.max_try} attempts"
+            error_payload = {
+                "judgement": "No",
+                "reason": error_msg,
+                "error": "evaluation_failed"
+            }
+            conv_data[conv_turn_idx]["judge result"] = [error_payload] * check_num
             return False
 
     async def _process_all_items(self, infer_result):

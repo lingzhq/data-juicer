@@ -85,9 +85,15 @@ def process_evaluation_file(file):
             cur_wcsr_numerator = 0
             cur_wcsr_denominator = 0
             
+            if not isinstance(conv.get("judge result"), list):
+                print(f"Warning: 'judge result' is not a list or is missing for a conversation turn. Skipping.")
+                continue
+
             for constraint, judge_result in zip(conv["constraints"], conv["judge result"]):
-                result = 1 if judge_result['judgement'] == 'Yes' else 0
-                
+                result = 0
+                if isinstance(judge_result, dict) and "error" not in judge_result:
+                    if judge_result.get('judgement') == 'Yes':
+                        result = 1
 
                 if result != 1:
                     cur_isr = 0
@@ -97,7 +103,7 @@ def process_evaluation_file(file):
                 cur_csr_results.append(result)
                 
 
-                if constraint['type'] not in weights:
+                if constraint.get('type') not in weights:
                     continue
                 
                 constraint_results[constraint['type']].append(result)
@@ -148,6 +154,9 @@ def process_evaluation_file(file):
 
 
 def generate_csv(csv_total_data):
+    if not csv_total_data:
+        print("No data to generate CSV.")
+        return
     with open('./structflow/data/eval/overall_score.csv', mode='w', newline='', encoding='utf-8') as file:
         writer = csv.DictWriter(file, fieldnames=csv_header)
         writer.writeheader()
