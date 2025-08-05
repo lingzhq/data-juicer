@@ -1,0 +1,5 @@
+# MedJourney Eval
+type: 'med_evaluator'
+med_task: 'medjourney'
+env_manager: 'current'
+evalscope_type: 'config'

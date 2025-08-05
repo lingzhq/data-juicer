@@ -40,8 +40,17 @@ class MedEvaluator:
     def run(self, eval_type, eval_obj=None, **kwargs):
 
         if self.med_task == 'medjourney':
-            med_journey_evaluator = MedJourneyEvaluator(self.eval_config)
-            results = med_journey_evaluator.run(eval_type, eval_obj, **kwargs)
+            gen_paths = self.eval_config.get('generated_config_paths', {})
+            
+            self.eval_config['config_path'] = gen_paths.get('medjourney')
+            self.eval_config['output_path'] = os.path.join(
+                self.eval_config['output_root_path'], 'medjourney')
+            results = MedJourneyEvaluator(self.eval_config).run(
+                eval_type, eval_obj, **kwargs)
+
+            if 'config_path' in self.eval_config:
+                del self.eval_config['config_path']
+                
         elif self.med_task == 'medagents':
             medagents_evaluator = MedAgentsEvaluator(self.eval_config)
             results = medagents_evaluator.run(eval_type, eval_obj, **kwargs)

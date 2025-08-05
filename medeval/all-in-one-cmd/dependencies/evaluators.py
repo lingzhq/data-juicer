@@ -1,4 +1,5 @@
 import json
+import sys
 import os
 import shutil
 import subprocess
@@ -96,15 +97,17 @@ class EvalscopeEvaluator(BaseEvaluator):
             if not self.config_path:
                 raise ValueError(
                     'config_path must be provided for config mode')
-            cmd = f'python {self.config_path} --work_dir {work_dir} 2>&1 | tee "{log_file}"'
+            cmd = f'{sys.executable} {self.config_path} --work_dir {work_dir} 2>&1 | tee "{log_file}"'
 
         else:
             if not all([self.model, self.datasets]):
                 raise ValueError('model and datasets must be provided')
 
             cmd_parts = [
-                'evalscope eval', f'--model "{self.model}"',
-                f'--work-dir {work_dir}', f'--eval-type {self.eval_service}'
+                f'{sys.executable} -m evalscope eval', 
+                f'--model "{self.model}"',
+                f'--work-dir {work_dir}', 
+                f'--eval-type {self.eval_service}'
             ]
             if self.datasets:
                 cmd_parts.append(f'--datasets {" ".join(self.datasets)}')

@@ -1,0 +1,12 @@
+CUDA_VISIBLE_DEVICES=7 python run_eval.py \
+  --config-template "configs/single.yaml" \
+  --input-path "data/med_data_sub" \
+  --infer-model-path "INFER_MODEL_PATH" \
+  --flames-model-path "FLAMES_MODEL_PATH" \
+  --output-path "OUTPUT_PATH" \
+  --env-name "CURRENT_ENV_NAME" \
+  --infer-port 8901 \
+  --infer-served-name "qwen25-1.5b" \
+  --eval-port 8902 \
+  --eval-served-name "qwen25-32b" \
+  --limit 20

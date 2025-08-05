@@ -296,7 +296,74 @@ class VirtualEnv(Env):
             raise RuntimeError(f'Failed to execute command [{cmd}].')
 
 
-ALL_ENVS = {CondaEnv, VirtualEnv}
+class CurrentEnv(Env):
+    """
+    A "no-op" environment that uses the current Python execution environment.
+    
+    This class assumes that all necessary dependencies are already installed
+    in the environment where the script is being run. It does not create or
+    manage virtual environments.
+    """
+
+    SUPPORTED_MANAGERS = {'current'}
+
+    def __init__(self, **kwargs):
+        """
+        Ignores all parameters as it doesn't manage an environment.
+        """
+        logger.info("Using the current Python environment for execution.")
+        pass
+
+    def check_availability(self):
+        """The current environment is always available."""
+        return True
+
+    def create(self):
+        """Does nothing, as we are using the current environment."""
+        logger.info("Skipping environment creation, using the current one.")
+        return
+
+    def exists(self):
+        """The current environment always 'exists'."""
+        return True
+
+    def install_py_deps(self, deps: Union[str, List[str]]):
+        """
+        Does nothing. Assumes dependencies are pre-installed.
+        This is crucial for platforms that manage dependencies via requirements.txt.
+        """
+        logger.warning(
+            f"Assuming dependencies '{deps}' are already installed in the current environment. Skipping installation."
+        )
+        return True
+
+    def run_cmd(self, cmd: str, use_sys_stdio=False):
+        """
+        Run a command directly in the current environment's shell.
+        """
+        logger.info(f"Executing command in current environment: {cmd}")
+        
+        if use_sys_stdio:
+            stdout, stderr = sys.stdout, sys.stderr
+        else:
+            stdout, stderr = None, None
+            
+        res = subprocess.run(cmd, shell=True, stdout=stdout, stderr=stderr)
+        
+        if res.returncode == 0:
+            logger.debug(f'Command [{cmd}] executed successfully.')
+            return True
+        else:
+            error_message = f'Failed to execute command [{cmd}].'
+            if res.stderr:
+                error_message += f"\nStderr: {res.stderr.decode('utf-8', errors='ignore')}"
+            if res.stdout:
+                 error_message += f"\nStdout: {res.stdout.decode('utf-8', errors='ignore')}"
+            logger.error(error_message)
+            raise RuntimeError(error_message)
+
+
+ALL_ENVS = {CondaEnv, VirtualEnv, CurrentEnv}
 
 ENV_ROUTER = {}
 for env_cls in ALL_ENVS:
