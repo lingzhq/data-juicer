@@ -1,4 +1,5 @@
 import argparse
+import os
 from evalscope import TaskConfig, run_task
 
 parser = argparse.ArgumentParser()
@@ -11,6 +12,11 @@ task_cfg = TaskConfig(
     api_key='EMPTY',
     eval_type='service',
     datasets=['ifeval'],
+    dataset_args={
+        'ifeval': {
+            'local_path': os.path.join(__INPUT_PATH__, 'ifeval'),
+        }
+    },
     work_dir=args.work_dir,
     limit=__LIMIT__,
 )

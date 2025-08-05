@@ -1,4 +1,5 @@
 import argparse
+import os
 from evalscope.perf.arguments import Arguments
 from evalscope.perf.main import run_perf_benchmark
 
@@ -13,6 +14,7 @@ task_cfg = Arguments(
     url=__API_URL_WITH_ENDPOINT__,
     api='openai',
     dataset='openqa',
+    dataset_path=os.path.join(__INPUT_PATH__, 'perf/open_qa.jsonl'),
     temperature=0.9,
     max_tokens=1024,
     min_prompt_length=10,
