@@ -25,3 +25,12 @@ Then run the entire evaluation in `run.sh`.
 The result of the above process is as follows:
 
 <img src="./radar_chart.png" width="400" alt="Radar Chart">
+
+## Table and Radar Chart Generation
+Move all experiments' results to a directory, and run the following command to generate the table and radar chart:
+
+```bash
+bash run_display.sh
+```
+> You can modify the `--model-dirs` and `model-colors` to customize the model list and color list.
+> To normalize the radar chart, you can manully modify the `min` and `max` of each metric in `configs/display.yaml`.
